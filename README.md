@@ -111,8 +111,8 @@ Double-click either launcher in Windows:
 ### Or Run with Node.js Server
 ```bash
 # Clone the repository
-git clone https://github.com/kavalimadhumathi-rgb/medical.git
-cd medical
+git clone https://github.com/kavalimadhumathi-rgb/medivault.git
+cd medivault
 
 # Start the MediVault AI server
 node backend/server.js
@@ -127,4 +127,3 @@ http://localhost:3100
 
 ## 📄 License
 This project is licensed under the MIT License.
-
