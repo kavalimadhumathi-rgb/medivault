@@ -1,4 +1,4 @@
-# MediVault AI — Intelligent Healthcare Information Platform
+# MediVault AI & PulseCare 360 — Clinical Healthcare Suite
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-emerald.svg)](https://nodejs.org/)
@@ -127,3 +127,4 @@ http://localhost:3100
 
 ## 📄 License
 This project is licensed under the MIT License.
+
