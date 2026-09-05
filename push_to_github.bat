@@ -2,7 +2,7 @@
 setlocal
 echo ===================================================
 echo MediVault AI - Push to GitHub
-echo Target: https://github.com/kavalimadhumathi-rgb/medical.git
+echo Target: https://github.com/kavalimadhumathi-rgb/medivault.git
 echo ===================================================
 set "PATH=C:\Users\Dell\.gemini\antigravity\scratch\mingit\cmd;%PATH%"
 set GIT="C:\Users\Dell\.gemini\antigravity\scratch\mingit\cmd\git.exe"
@@ -13,7 +13,7 @@ set /p TOKEN="Enter GitHub Token (or press Enter for standard browser sign-in): 
 if "%TOKEN%"=="" (
     %GIT% push -u origin main
 ) else (
-    %GIT% push -u https://%TOKEN%@github.com/kavalimadhumathi-rgb/medical.git main
+    %GIT% push -u https://%TOKEN%@github.com/kavalimadhumathi-rgb/medivault.git main
 )
 
 pause
