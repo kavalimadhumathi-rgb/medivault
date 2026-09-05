@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediVault AI — Intelligent Healthcare Information Platform</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            },
+            clinical: {
+              slate: '#0f172a',
+              navy: '#1e293b',
+              surface: '#f8fafc',
+              border: '#e2e8f0',
+              muted: '#64748b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/css/custom.css" />
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+  <div id="app" class="flex-1 flex flex-col">
+    <!-- Rendered dynamically by app.js -->
+  </div>
+
+  <!-- Global Modal Container -->
+  <div id="modal-root"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Scripts -->
+  <script src="/js/mock_documents.js"></script>
+  
+  <!-- Component Scripts -->
+  <script src="/js/components/LandingPage.js"></script>
+  <script src="/js/components/Navbar.js"></script>
+  <script src="/js/components/Sidebar.js"></script>
+  <script src="/js/components/Dashboard.js"></script>
+  <script src="/js/components/PatientForm.js"></script>
+  <script src="/js/components/PatientRecord.js"></script>
+  <script src="/js/components/ReportUpload.js"></script>
+  <script src="/js/components/SplitVerification.js"></script>
+  <script src="/js/components/LabResultsTable.js"></script>
+  <script src="/js/components/TrendCharts.js"></script>
+  <script src="/js/components/ReportCompare.js"></script>
+  <script src="/js/components/AISummaryView.js"></script>
+  <script src="/js/components/Inconsistencies.js"></script>
+  <script src="/js/components/Clarifications.js"></script>
+  <script src="/js/components/AuditHistory.js"></script>
+  <script src="/js/components/SettingsPrivacy.js"></script>
+
+  <!-- Main Application Orchestrator -->
+  <script src="/js/app.js"></script>
+</body>
+</html>
