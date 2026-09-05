@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/pulsecare", "destination": "/pulsecare-360/index.html" },
+    { "source": "/medivault", "destination": "/MediVault_AI_Standalone.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
