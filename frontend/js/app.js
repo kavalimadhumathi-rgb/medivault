@@ -59,24 +59,40 @@ class MediVaultApp {
       }
 
       // Fetch patient directory
-      const resPatients = await fetch('/api/patients');
-      if (resPatients.ok) {
-        this.state.patients = await resPatients.json();
+      let apiConnected = false;
+      try {
+        const resPatients = await fetch('/api/patients');
+        if (resPatients.ok) {
+          this.state.patients = await resPatients.json();
+          apiConnected = true;
+        }
+      } catch (e) {}
+
+      // If backend not reached, load from standalone embedded clinical store
+      if (!apiConnected || !this.state.patients || this.state.patients.length === 0) {
+        if (window.STANDALONE_STORE) {
+          this.state.patients = JSON.parse(JSON.stringify(window.STANDALONE_STORE.patients));
+          this.state.reports = JSON.parse(JSON.stringify(window.STANDALONE_STORE.reports));
+          this.state.labs = JSON.parse(JSON.stringify(window.STANDALONE_STORE.labs));
+          this.state.inconsistencies = JSON.parse(JSON.stringify(window.STANDALONE_STORE.inconsistencies));
+          this.state.clarifications = JSON.parse(JSON.stringify(window.STANDALONE_STORE.clarifications));
+          this.state.timeline = JSON.parse(JSON.stringify(window.STANDALONE_STORE.timeline));
+          this.state.auditLogs = JSON.parse(JSON.stringify(window.STANDALONE_STORE.auditLogs));
+        }
+      } else {
+        // Connected to server
+        try {
+          const resReportsAll = await fetch('/api/reports');
+          if (resReportsAll.ok) this.state.reports = await resReportsAll.json();
+        } catch (e) {}
+
+        try {
+          const resAudit = await fetch('/api/audit');
+          if (resAudit.ok) this.state.auditLogs = await resAudit.json();
+        } catch (e) {}
       }
 
-      // Fetch all reports for dashboard
-      const resReportsAll = await fetch('/api/reports');
-      if (resReportsAll.ok) {
-        this.state.reports = await resReportsAll.json();
-      }
-
-      // Fetch audit logs
-      const resAudit = await fetch('/api/audit');
-      if (resAudit.ok) {
-        this.state.auditLogs = await resAudit.json();
-      }
-
-      // Default active patient to Rahul Mehta (P-10491) or Ananya Rao (P-10490) or first patient
+      // Default active patient to Rahul Mehta (P-10491) or first patient
       if (this.state.patients.length > 0) {
         const defaultPatient = this.state.patients.find(p => p.id === 'P-10491') || 
                                this.state.patients.find(p => p.id === 'P-10490') || 
@@ -103,48 +119,86 @@ class MediVaultApp {
   }
 
   async selectPatient(patientId, shouldRender = true) {
+    let loadedFromApi = false;
     try {
       const resP = await fetch(`/api/patients/${patientId}`);
       if (resP.ok) {
         this.state.activePatient = await resP.json();
+        loadedFromApi = true;
       }
-      
+    } catch (e) {}
+
+    if (!loadedFromApi) {
+      const found = (this.state.patients || []).find(p => p.id === patientId);
+      if (found) {
+        this.state.activePatient = found;
+      }
+    }
+
+    try {
       const resLabs = await fetch(`/api/patients/${patientId}/labs`);
       if (resLabs.ok) {
         this.state.labs = await resLabs.json();
+      } else throw new Error();
+    } catch (e) {
+      if (window.STANDALONE_STORE) {
+        this.state.labs = window.STANDALONE_STORE.labs.filter(l => l.patientId === patientId);
       }
+    }
 
+    try {
       const resReports = await fetch(`/api/patients/${patientId}/reports`);
       if (resReports.ok) {
         this.state.reports = await resReports.json();
-        if (this.state.reports.length > 0) {
-          this.state.selectedVerificationReportId = this.state.reports[0].id;
-          this.state.compareRep1 = this.state.reports[1] ? this.state.reports[1].id : this.state.reports[0].id;
-          this.state.compareRep2 = this.state.reports[0].id;
-          await this.fetchComparisonData();
-        }
+      } else throw new Error();
+    } catch (e) {
+      if (window.STANDALONE_STORE) {
+        this.state.reports = window.STANDALONE_STORE.reports.filter(r => r.patientId === patientId);
       }
+    }
 
+    if (this.state.reports && this.state.reports.length > 0) {
+      this.state.selectedVerificationReportId = this.state.reports[0].id;
+      this.state.compareRep1 = this.state.reports[1] ? this.state.reports[1].id : this.state.reports[0].id;
+      this.state.compareRep2 = this.state.reports[0].id;
+      await this.fetchComparisonData();
+    }
+
+    try {
       const resInconst = await fetch(`/api/patients/${patientId}/inconsistencies`);
       if (resInconst.ok) {
         this.state.inconsistencies = await resInconst.json();
+      } else throw new Error();
+    } catch (e) {
+      if (window.STANDALONE_STORE) {
+        this.state.inconsistencies = window.STANDALONE_STORE.inconsistencies.filter(c => c.patientId === patientId);
       }
+    }
 
+    try {
       const resClarify = await fetch(`/api/patients/${patientId}/clarifications`);
       if (resClarify.ok) {
         this.state.clarifications = await resClarify.json();
+      } else throw new Error();
+    } catch (e) {
+      if (window.STANDALONE_STORE) {
+        this.state.clarifications = window.STANDALONE_STORE.clarifications.filter(c => c.patientId === patientId);
       }
+    }
 
+    try {
       const resTimeline = await fetch(`/api/patients/${patientId}/timeline`);
       if (resTimeline.ok) {
         this.state.timeline = await resTimeline.json();
-      }
-
-      if (shouldRender) {
-        this.render();
-      }
+      } else throw new Error();
     } catch (e) {
-      console.error("Error selecting patient:", e);
+      if (window.STANDALONE_STORE) {
+        this.state.timeline = window.STANDALONE_STORE.timeline.filter(t => t.patientId === patientId);
+      }
+    }
+
+    if (shouldRender) {
+      this.render();
     }
   }
 
@@ -610,12 +664,94 @@ class MediVaultApp {
         this.showToast(`Updated record for ${updated.fullName}`, 'success');
         this.render();
       } else {
-        this.showToast("Error updating patient profile", 'error');
+        throw new Error("Update failed");
       }
     } catch (err) {
-      console.error(err);
-      this.showToast("Network error updating patient", 'error');
+      // Offline fallback: update in-memory state
+      const idx = this.state.patients.findIndex(p => p.id === patientId);
+      if (idx !== -1) {
+        this.state.patients[idx] = {
+          ...this.state.patients[idx],
+          ...payload,
+          userProvided: {
+            ...this.state.patients[idx].userProvided,
+            symptoms: payload.symptoms,
+            conditions: payload.conditions,
+            allergies: payload.allergies,
+            medications: payload.medications,
+            medicalHistory: payload.medicalHistory,
+            familyHistory: payload.familyHistory
+          }
+        };
+        this.state.activePatient = this.state.patients[idx];
+      }
+      this.closeModal();
+      this.showToast(`Updated record for ${payload.fullName}`, 'success');
+      this.render();
     }
+  }
+
+  async handleCreatePatient(e) {
+    e.preventDefault();
+    const form = e.target;
+    const dob = form.dob.value;
+    const birthYear = new Date(dob).getFullYear();
+    const age = new Date().getFullYear() - birthYear || 30;
+    
+    const newId = 'P-' + Math.floor(10500 + Math.random() * 500);
+    const newPatient = {
+      id: newId,
+      fullName: form.fullName.value,
+      dob: dob,
+      age: age,
+      sex: form.sex.value,
+      phone: form.phone ? form.phone.value : '',
+      email: form.email ? form.email.value : '',
+      bloodGroup: form.bloodGroup ? form.bloodGroup.value : 'A+',
+      emergencyContact: {
+        name: form.emergencyContact ? form.emergencyContact.value : 'Family Contact',
+        phone: form.phone ? form.phone.value : '',
+        relation: 'Primary'
+      },
+      userProvided: {
+        symptoms: form.symptoms ? form.symptoms.value.split(',').map(s => s.trim()).filter(Boolean) : [],
+        conditions: form.conditions ? form.conditions.value.split(',').map(c => c.trim()).filter(Boolean) : [],
+        allergies: form.allergies ? form.allergies.value.split(',').map(a => a.trim()).filter(Boolean) : [],
+        medications: form.medications ? form.medications.value.split(',').map(m => m.trim()).filter(Boolean) : [],
+        medicalHistory: form.medicalHistory ? form.medicalHistory.value : '',
+        familyHistory: form.familyHistory ? form.familyHistory.value : ''
+      },
+      verifiedData: {
+        labTestsCount: 0,
+        unverifiedCount: 0,
+        conflictsCount: 0,
+        timelineEvents: 1
+      },
+      verificationStatus: 'Needs Review',
+      assignedDoctor: this.state.currentUser ? this.state.currentUser.name : 'Dr. Emily Vance',
+      lastVisit: new Date().toISOString().split('T')[0]
+    };
+
+    try {
+      const res = await fetch('/api/patients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newPatient)
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        this.state.patients.unshift(saved);
+        this.state.activePatient = saved;
+      } else {
+        throw new Error();
+      }
+    } catch (err) {
+      this.state.patients.unshift(newPatient);
+      this.state.activePatient = newPatient;
+    }
+
+    this.showToast(`Patient ${newPatient.fullName} (${newPatient.id}) registered successfully`, 'success');
+    this.navigateTo('patient-record');
   }
 
   // --- Manual Lab Entry Modal (Fallback for unreadable reports) ---

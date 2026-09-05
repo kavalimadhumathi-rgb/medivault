@@ -154,6 +154,128 @@ const DEMO_PATIENTS = [
     lastUpdated: "2026-09-05T09:30:00Z",
     verificationStatus: "Verified",
     summary: null
+  },
+  {
+    id: "P-10492",
+    patient_id: "P-10492",
+    fullName: "David Kim",
+    name: "David Kim",
+    dob: "1968-11-15",
+    age: 58,
+    sex: "Male",
+    bloodGroup: "O+",
+    phone: "+1 (555) 819-2034",
+    email: "david.kim.demo@example.com",
+    emergencyContact: {
+      name: "Grace Kim",
+      relation: "Spouse",
+      phone: "+1 (555) 819-2035"
+    },
+    userProvided: {
+      symptoms: [
+        { text: "Mild exertional shortness of breath on climbing 2 flights", dateAdded: "2026-08-15", source: "USER PROVIDED" }
+      ],
+      conditions: [
+        { text: "Coronary Artery Disease (s/p LAD Stent in 2024)", diagnosedYear: "2024", source: "USER PROVIDED" },
+        { text: "Hypercholesterolemia", diagnosedYear: "2020", source: "USER PROVIDED" }
+      ],
+      allergies: [
+        { allergen: "Iodinated Radiocontrast", reaction: "Hives and nausea", severity: "Moderate", source: "USER PROVIDED" }
+      ],
+      medications: [
+        { name: "Aspirin", dosage: "81 mg", frequency: "Once daily", source: "USER PROVIDED" },
+        { name: "Clopidogrel", dosage: "75 mg", frequency: "Once daily", source: "USER PROVIDED" },
+        { name: "Atorvastatin", dosage: "40 mg", frequency: "Once daily bedtime", source: "USER PROVIDED" }
+      ],
+      procedures: [
+        { procedure: "Percutaneous Coronary Intervention (PCI)", year: "2024", hospital: "Metropolitan Heart Center", source: "USER PROVIDED" }
+      ],
+      medicalHistory: "Cardiac rehab completed Nov 2024. Non-smoker.",
+      familyHistory: "Father died of sudden cardiac arrest at age 54."
+    },
+    reportCount: 2,
+    lastUpdated: "2026-09-03T14:20:00Z",
+    verificationStatus: "Verified",
+    summary: null
+  },
+  {
+    id: "P-10493",
+    patient_id: "P-10493",
+    fullName: "Priya Patel",
+    name: "Priya Patel",
+    dob: "2000-03-22",
+    age: 26,
+    sex: "Female",
+    bloodGroup: "B+",
+    phone: "+1 (555) 902-3341",
+    email: "priya.patel.demo@example.com",
+    emergencyContact: {
+      name: "Ramesh Patel",
+      relation: "Father",
+      phone: "+1 (555) 902-3342"
+    },
+    userProvided: {
+      symptoms: [
+        { text: "Irregular menstrual cycles", dateAdded: "2026-08-12", source: "USER PROVIDED" },
+        { text: "Persistent acne along jawline", dateAdded: "2026-08-12", source: "USER PROVIDED" }
+      ],
+      conditions: [
+        { text: "Polycystic Ovary Syndrome (PCOS)", diagnosedYear: "2023", source: "USER PROVIDED" },
+        { text: "Insulin Resistance", diagnosedYear: "2023", source: "USER PROVIDED" }
+      ],
+      allergies: [],
+      medications: [
+        { name: "Metformin ER", dosage: "750 mg", frequency: "Once daily with dinner", source: "USER PROVIDED" },
+        { name: "Spironolactone", dosage: "50 mg", frequency: "Once daily", source: "USER PROVIDED" }
+      ],
+      procedures: [],
+      medicalHistory: "Pelvic ultrasound 2023 demonstrated bilateral polycystic morphology.",
+      familyHistory: "Mother and aunt have Type 2 Diabetes."
+    },
+    reportCount: 1,
+    lastUpdated: "2026-09-02T11:00:00Z",
+    verificationStatus: "Needs Review",
+    summary: null
+  },
+  {
+    id: "P-10494",
+    patient_id: "P-10494",
+    fullName: "Michael Torres",
+    name: "Michael Torres",
+    dob: "1959-07-08",
+    age: 67,
+    sex: "Male",
+    bloodGroup: "AB+",
+    phone: "+1 (555) 472-8819",
+    email: "michael.torres.demo@example.com",
+    emergencyContact: {
+      name: "Elena Torres",
+      relation: "Daughter",
+      phone: "+1 (555) 472-8820"
+    },
+    userProvided: {
+      symptoms: [
+        { text: "Intermittent left great toe joint pain", dateAdded: "2026-07-20", source: "USER PROVIDED" }
+      ],
+      conditions: [
+        { text: "Chronic Kidney Disease (Stage 3a)", diagnosedYear: "2022", source: "USER PROVIDED" },
+        { text: "Gout", diagnosedYear: "2021", source: "USER PROVIDED" }
+      ],
+      allergies: [
+        { allergen: "Codeine", reaction: "Severe nausea and dizziness", severity: "Moderate", source: "USER PROVIDED" }
+      ],
+      medications: [
+        { name: "Allopurinol", dosage: "100 mg", frequency: "Daily", source: "USER PROVIDED" },
+        { name: "Losartan", dosage: "25 mg", frequency: "Daily", source: "USER PROVIDED" }
+      ],
+      procedures: [],
+      medicalHistory: "Baseline eGFR tracked quarterly.",
+      familyHistory: "Father had hypertension."
+    },
+    reportCount: 2,
+    lastUpdated: "2026-08-30T16:00:00Z",
+    verificationStatus: "Verified",
+    summary: null
   }
 ];
 

@@ -77,9 +77,25 @@
 
 ---
 
+## 🏥 Included Applications in this Suite
+
+### 1. MediVault AI (Document Intelligence & Verification)
+- **Standalone Version:** Double-click `launch_standalone.bat` or open `MediVault_AI_Standalone.html` directly in any web browser.
+- **REST Server Version:** Run `node backend/server.js` and open `http://localhost:3100`.
+- **Preloaded Patients:** Rahul Mehta, Ananya Rao, Sarah Jenkins, David Kim, Priya Patel, Michael Torres.
+
+### 2. PulseCare 360 (Multi-Patient EHR & Telehealth Hub)
+- **Directory:** Located in `./pulsecare-360/`.
+- **Instant Launch:** Double-click `pulsecare-360/launch_app.bat` or open `pulsecare-360/index.html` directly in your browser.
+- **Preloaded Patients:** 12 diverse clinical profiles across Cardiology, Endocrinology, Pediatrics, Geriatrics, Pulmonology, Obstetrics, Oncology, Rheumatology, Orthopedics, Nephrology, Neurology, and Hematology.
+- **Dynamic Intake:** Click **"+ Add Patient"** to register unlimited new patient records.
+- **Clinical Tools:** Live 60fps simulated Lead II ECG rhythm monitor, WebRTC virtual consultation room with SOAP notes, digital prescription pad with printable Rx PDF, and AI Drug-Drug Interaction screening.
+
+---
+
 ## 🛠️ Tech Stack & Architecture
 
-- **Frontend:** Clean Vanilla JavaScript (ES6+), Tailwind CSS CDN, Lucide Icons.
+- **Frontend:** Clean Vanilla JavaScript (ES6+), Tailwind CSS CDN, Lucide Icons, HTML5 Canvas ECG.
 - **Backend:** Node.js native HTTP REST API, in-memory relational data store.
 - **Architecture:** Zero heavyweight dependencies; lightweight, blazingly fast, and completely portable.
 
@@ -87,14 +103,16 @@
 
 ## 🏃 Getting Started
 
-### Prerequisites
-- Node.js (v18 or higher)
+### Quick Start (Zero Dependencies — 1 Click)
+Double-click either launcher in Windows:
+- `launch_standalone.bat` (MediVault AI)
+- `pulsecare-360/launch_app.bat` (PulseCare 360)
 
-### Installation & Launch
+### Or Run with Node.js Server
 ```bash
 # Clone the repository
-git clone https://github.com/kavalimadhumathi-rgb/medical-app.git
-cd medical-app
+git clone https://github.com/kavalimadhumathi-rgb/medical.git
+cd medical
 
 # Start the MediVault AI server
 node backend/server.js

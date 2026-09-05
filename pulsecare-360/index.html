@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PulseCare 360 — Next-Gen Telehealth, Multi-Patient EHR & Clinical Hub</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b'
+            },
+            accent: {
+              50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.5); }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 20px; background: white !important; color: black !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 lg:px-8 py-3.5 shadow-xs flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-accent-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+        <i data-lucide="activity" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-extrabold tracking-tight text-slate-900">PulseCare <span class="text-brand-600">360</span></span>
+          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200">Clinical Suite</span>
+        </div>
+        <p class="text-[11px] text-slate-500 hidden sm:block">Multi-Patient EHR, Telehealth & Diagnostic Center</p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/80">
+      <button onclick="app.setTab('dashboard')" id="nav-dashboard" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-white text-slate-900 shadow-xs flex items-center gap-1.5">
+        <i data-lucide="layout-grid" class="w-4 h-4 text-brand-600"></i> Clinic Overview
+      </button>
+      <button onclick="app.setTab('patients')" id="nav-patients" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+        <i data-lucide="users" class="w-4 h-4"></i> Patient Directory (<span id="header-patient-count">12</span>)
+      </button>
+      <button onclick="app.setTab('telehealth')" id="nav-telehealth" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5 relative">
+        <i data-lucide="video" class="w-4 h-4 text-rose-500"></i> Virtual Consult
+        <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping absolute top-1.5 right-1"></span>
+      </button>
+      <button onclick="app.setTab('ai-triage')" id="nav-ai-triage" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+        <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i> AI Sentinel
+      </button>
+      <button onclick="app.setTab('appointments')" id="nav-appointments" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+        <i data-lucide="calendar" class="w-4 h-4"></i> Schedule
+      </button>
+    </nav>
+
+    <!-- Quick Actions -->
+    <div class="flex items-center gap-3">
+      <button onclick="app.openAddPatientModal()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+        <i data-lucide="user-plus" class="w-4 h-4"></i>
+        <span>+ Add Patient</span>
+      </button>
+
+      <button onclick="app.setTab('telehealth')" class="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-rose-600/20 transition flex items-center gap-1.5">
+        <i data-lucide="phone-call" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Telehealth</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main View Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div id="view-container"></div>
+  </main>
+
+  <!-- Modal Container -->
+  <div id="modal-container"></div>
+
+  <!-- Print Area -->
+  <div id="print-area" class="hidden"></div>
+
+  <!-- Application Bundle -->
+  <script>
+    // 12 Comprehensive Clinical Patient Records Across Diverse Specialties
+    const INITIAL_PATIENTS = [
+      {
+        id: "PC-301",
+        name: "Elena Rostova",
+        age: 34,
+        gender: "Female",
+        dob: "1992-04-12",
+        bloodType: "A+",
+        department: "Cardiology",
+        photo: "ER",
+        avatarColor: "bg-rose-100 text-rose-800",
+        status: "Under Tele-Observation",
+        riskLevel: "Moderate",
+        condition: "Post-Viral Myocarditis & Sinus Arrhythmia",
+        attending: "Dr. Sarah Lin, MD",
+        contact: "+1 (555) 234-8901",
+        email: "elena.rostova@example.com",
+        allergies: ["Penicillin (Anaphylaxis)", "NSAIDs (Bronchospasm)"],
+        medications: [
+          { name: "Metoprolol Succinate", dosage: "25mg", freq: "Once daily with breakfast", category: "Beta-Blocker" },
+          { name: "Colchicine", dosage: "0.6mg", freq: "Once daily", category: "Anti-inflammatory" },
+          { name: "CoQ10", dosage: "200mg", freq: "Once daily", category: "Supplement" }
+        ],
+        vitals: { hr: 76, bp: "118/74", spo2: 99, temp: "98.4", resp: 16 },
+        labs: [
+          { test: "High-Sensitivity Troponin I", value: "14", unit: "ng/L", range: "< 14 ng/L", status: "Borderline", date: "2026-09-02" },
+          { test: "NT-proBNP", value: "128", unit: "pg/mL", range: "< 125 pg/mL", status: "Slightly Elevated", date: "2026-09-02" },
+          { test: "C-Reactive Protein (hs-CRP)", value: "3.2", unit: "mg/L", range: "< 1.0 mg/L", status: "High", date: "2026-09-02" }
+        ],
+        notes: "Resting palpitations improving. 24h Holter monitoring demonstrates reduction in ectopic atrial beats."
+      },
+      {
+        id: "PC-302",
+        name: "Marcus Vance",
+        age: 58,
+        gender: "Male",
+        dob: "1968-09-20",
+        bloodType: "O+",
+        department: "Endocrinology",
+        photo: "MV",
+        avatarColor: "bg-blue-100 text-blue-800",
+        status: "Chronic Care Management",
+        riskLevel: "High",
+        condition: "Type 2 Diabetes Mellitus & Stage 3a CKD",
+        attending: "Dr. Sarah Lin, MD",
+        contact: "+1 (555) 872-1049",
+        email: "marcus.vance@example.com",
+        allergies: ["Sulfa Drugs (Rash)"],
+        medications: [
+          { name: "Empagliflozin (Jardiance)", dosage: "10mg", freq: "Once daily mornings", category: "SGLT2 Inhibitor" },
+          { name: "Semaglutide (Ozempic)", dosage: "1.0mg", freq: "Subcutaneous weekly", category: "GLP-1 RA" },
+          { name: "Atorvastatin", dosage: "40mg", freq: "At bedtime", category: "Statin" },
+          { name: "Lisinopril", dosage: "20mg", freq: "Once daily", category: "ACE Inhibitor" }
+        ],
+        vitals: { hr: 72, bp: "134/86", spo2: 97, temp: "98.6", resp: 15 },
+        labs: [
+          { test: "Hemoglobin A1c", value: "7.8", unit: "%", range: "< 5.7 %", status: "High", date: "2026-08-28" },
+          { test: "Fasting Serum Glucose", value: "154", unit: "mg/dL", range: "70 - 99 mg/dL", status: "High", date: "2026-08-28" },
+          { test: "eGFR (CKD-EPI)", value: "54", unit: "mL/min/1.73m2", range: "> 60 mL/min", status: "Low", date: "2026-08-28" },
+          { test: "Serum Creatinine", value: "1.42", unit: "mg/dL", range: "0.74 - 1.35 mg/dL", status: "High", date: "2026-08-28" }
+        ],
+        notes: "eGFR holding stable. Blood glucose diary averages 138-160 mg/dL fasting. Encouraged 2L water intake daily."
+      },
+      {
+        id: "PC-303",
+        name: "Sophia Chen",
+        age: 8,
+        gender: "Female",
+        dob: "2018-02-14",
+        bloodType: "B+",
+        department: "Pediatrics",
+        photo: "SC",
+        avatarColor: "bg-emerald-100 text-emerald-800",
+        status: "Outpatient Follow-up",
+        riskLevel: "Low",
+        condition: "Mild Persistent Asthma (Allergic Phenotype)",
+        attending: "Dr. Marcus Patel, MD",
+        contact: "+1 (555) 431-7721",
+        email: "chen.family@example.com",
+        allergies: ["Peanuts (Severe - EpiPen)", "Dust Mites"],
+        medications: [
+          { name: "Fluticasone Propionate Inhaler", dosage: "44mcg", freq: "2 puffs twice daily with spacer", category: "Inhaled Corticosteroid" },
+          { name: "Albuterol HFA", dosage: "90mcg", freq: "As needed for wheeze", category: "Bronchodilator" }
+        ],
+        vitals: { hr: 94, bp: "96/62", spo2: 99, temp: "98.2", resp: 20 },
+        labs: [
+          { test: "Peak Expiratory Flow (PEF)", value: "185", unit: "L/min", range: "170 - 210 L/min", status: "Normal", date: "2026-08-30" },
+          { test: "Absolute Eosinophils", value: "480", unit: "/mcL", range: "50 - 400 /mcL", status: "Slightly High", date: "2026-08-15" }
+        ],
+        notes: "Asthma action plan updated for elementary school. Spacer technique reviewed and verified."
+      },
+      {
+        id: "PC-304",
+        name: "Arthur Pendelton",
+        age: 72,
+        gender: "Male",
+        dob: "1954-11-03",
+        bloodType: "O-",
+        department: "Geriatrics",
+        photo: "AP",
+        avatarColor: "bg-purple-100 text-purple-800",
+        status: "Polypharmacy Review",
+        riskLevel: "High",
+        condition: "Ischemic Stroke (Post-Rehab), HTN, Mild Cognitive Impairment",
+        attending: "Dr. Sarah Lin, MD",
+        contact: "+1 (555) 609-3342",
+        email: "arthur.pendelton@example.com",
+        allergies: ["Codeine (Nausea/Vomiting)"],
+        medications: [
+          { name: "Clopidogrel (Plavix)", dosage: "75mg", freq: "Once daily with food", category: "Antiplatelet" },
+          { name: "Amlodipine Besylate", dosage: "5mg", freq: "Once daily mornings", category: "CCB" },
+          { name: "Donepezil", dosage: "10mg", freq: "At bedtime", category: "Cholinesterase Inhibitor" },
+          { name: "Pantoprazole", dosage: "40mg", freq: "Once daily before breakfast", category: "PPI" }
+        ],
+        vitals: { hr: 68, bp: "128/82", spo2: 96, temp: "97.9", resp: 16 },
+        labs: [
+          { test: "Prothrombin Time / INR", value: "1.05", unit: "INR", range: "0.8 - 1.2", status: "Normal", date: "2026-08-20" },
+          { test: "Serum Vitamin B12", value: "410", unit: "pg/mL", range: "200 - 900 pg/mL", status: "Normal", date: "2026-08-20" }
+        ],
+        notes: "Gait steady with single point cane. Caregiver assistance established for pill organizer."
+      },
+      {
+        id: "PC-305",
+        name: "Dr. Rajesh Kumar",
+        age: 45,
+        gender: "Male",
+        dob: "1981-06-18",
+        bloodType: "AB+",
+        department: "Pulmonology",
+        photo: "RK",
+        avatarColor: "bg-teal-100 text-teal-800",
+        status: "Annual Surveillance",
+        riskLevel: "Low",
+        condition: "Occupational Silica Exposure Follow-up (Stable)",
+        attending: "Dr. Sarah Lin, MD",
+        contact: "+1 (555) 912-4455",
+        email: "rajesh.kumar@researchlab.org",
+        allergies: ["None known"],
+        medications: [
+          { name: "N-Acetylcysteine (NAC)", dosage: "600mg", freq: "Twice daily", category: "Antioxidant" }
+        ],
+        vitals: { hr: 64, bp: "114/72", spo2: 99, temp: "98.5", resp: 14 },
+        labs: [
+          { test: "Spirometry FEV1/FVC", value: "82", unit: "%", range: "> 75 %", status: "Normal", date: "2026-07-15" },
+          { test: "DLCO (Diffusing Capacity)", value: "94", unit: "% pred", range: "> 80 %", status: "Normal", date: "2026-07-15" }
+        ],
+        notes: "High-resolution chest CT scan shows zero parenchymal scarring. Pulmonary function intact."
+      },
+      {
+        id: "PC-306",
+        name: "Camila Santos",
+        age: 29,
+        gender: "Female",
+        dob: "1997-01-25",
+        bloodType: "O+",
+        department: "Obstetrics",
+        photo: "CS",
+        avatarColor: "bg-pink-100 text-pink-800",
+        status: "High-Risk Prenatal",
+        riskLevel: "Moderate",
+        condition: "Primigravida 28 Weeks, Borderline Gestational HTN",
+        attending: "Dr. Sarah Lin, MD",
+        contact: "+1 (555) 789-3211",
+        email: "camila.santos@example.com",
+        allergies: ["Amoxicillin (Urticaria)"],
+        medications: [
+          { name: "Labetalol", dosage: "100mg", freq: "Twice daily", category: "Antihypertensive (Pregnancy Safe)" },
+          { name: "Prenatal Multivitamin with Iron", dosage: "1 tab", freq: "Once daily", category: "Nutritional" },
+          { name: "Low-Dose Aspirin", dosage: "81mg", freq: "Daily for preeclampsia prophylaxis", category: "Antiplatelet" }
+        ],
+        vitals: { hr: 82, bp: "132/84", spo2: 99, temp: "98.7", resp: 18 },
+        labs: [
+          { test: "Urine Protein/Creatinine Ratio", value: "0.18", unit: "mg/mg", range: "< 0.30 mg/mg", status: "Normal", date: "2026-09-01" },
+          { test: "Fetal Doppler Heart Rate", value: "142", unit: "BPM", range: "110 - 160 BPM", status: "Normal", date: "2026-09-01" }
+        ],
+        notes: "Fetal movement counts robust. Blood pressure trending at target under Labetalol 100mg BID."
+      },
+      {
+        id: "PC-307",
+        name: "Jonathan Hayes",
+        age: 64,
+        gender: "Male",
+        dob: "1962-07-19",
+        bloodType: "A-",
+        department: "Oncology",
+        photo: "JH",
+        avatarColor: "bg-amber-100 text-amber-800",
+        status: "Post-Chemotherapy Surveillance",
+        riskLevel: "High",
+        condition: "Colorectal Adenocarcinoma (Stage IIA, R0 Resection)",
+        attending: "Dr. Katherine Lee, MD",
+        contact: "+1 (555) 349-2211",
+        email: "jonathan.hayes@example.com",
+        allergies: ["Iodinated Radiocontrast (Severe)"],
+        medications: [
+          { name: "Capecitabine (Xeloda)", dosage: "1000mg", freq: "Twice daily on 14/7 cycle", category: "Chemotherapy" },
+          { name: "Ondansetron (Zofran)", dosage: "8mg", freq: "Every 8 hours as needed", category: "Antiemetic" }
+        ],
+        vitals: { hr: 78, bp: "122/78", spo2: 98, temp: "98.1", resp: 16 },
+        labs: [
+          { test: "Carcinoembryonic Antigen (CEA)", value: "1.8", unit: "ng/mL", range: "< 3.0 ng/mL", status: "Normal", date: "2026-08-22" },
+          { test: "Absolute Neutrophil Count", value: "2100", unit: "/mcL", range: "1500 - 8000 /mcL", status: "Normal", date: "2026-08-22" }
+        ],
+        notes: "Cycle 4 completed without febrile neutropenia. CEA biomarker is well within remission baseline."
+      },
+      {
+        id: "PC-308",
+        name: "Priya Sharma",
+        age: 41,
+        gender: "Female",
+        dob: "1985-03-30",
+        bloodType: "B-",
+        department: "Rheumatology",
+        photo: "PS",
+        avatarColor: "bg-indigo-100 text-indigo-800",
+        status: "Immunosuppressive Maintenance",
+        riskLevel: "Moderate",
+        condition: "Systemic Lupus Erythematosus (SLE) with Lupus Nephritis Class III",
+        attending: "Dr. Sarah Lin, MD",
+        contact: "+1 (555) 551-8933",
+        email: "priya.sharma@example.com",
+        allergies: ["Sulfonamides (Photosensitivity/Flare)"],
+        medications: [
+          { name: "Hydroxychloroquine (Plaquenil)", dosage: "200mg", freq: "Once daily", category: "Antimalarial/DMARD" },
+          { name: "Mycophenolate Mofetil (CellCept)", dosage: "1000mg", freq: "Twice daily on empty stomach", category: "Immunosuppressant" },
+          { name: "Prednisone", dosage: "5mg", freq: "Daily taper", category: "Corticosteroid" }
+        ],
+        vitals: { hr: 70, bp: "116/76", spo2: 99, temp: "98.6", resp: 15 },
+        labs: [
+          { test: "Anti-dsDNA Antibodies", value: "24", unit: "IU/mL", range: "< 30 IU/mL", status: "Normal", date: "2026-08-14" },
+          { test: "Complement C3", value: "98", unit: "mg/dL", range: "90 - 180 mg/dL", status: "Normal", date: "2026-08-14" }
+        ],
+        notes: "Lupus nephritis in serologic and clinical quiescence. Annual ophthalmology retinal screening clear."
+      },
+      {
+        id: "PC-309",
+        name: "Lucas Bradley",
+        age: 16,
+        gender: "Male",
+        dob: "2010-09-11",
+        bloodType: "O+",
+        department: "Orthopedics",
+        photo: "LB",
+        avatarColor: "bg-cyan-100 text-cyan-800",
+        status: "Post-Operative Recovery",
+        riskLevel: "Low",
+        condition: "Right Knee ACL Reconstruction (Bone-Patellar Tendon-Bone Graft)",
+        attending: "Dr. Michael Chen, MD",
+        contact: "+1 (555) 773-4019",
+        email: "bradley.family@example.com",
+        allergies: ["Latex (Contact Dermatitis)"],
+        medications: [
+          { name: "Acetaminophen Extra Strength", dosage: "500mg", freq: "Every 6 hours as needed for soreness", category: "Analgesic" },
+          { name: "Celecoxib", dosage: "100mg", freq: "Once daily with food", category: "COX-2 Inhibitor" }
+        ],
+        vitals: { hr: 62, bp: "112/68", spo2: 100, temp: "98.3", resp: 14 },
+        labs: [
+          { test: "C-Reactive Protein", value: "0.8", unit: "mg/L", range: "< 1.0 mg/L", status: "Normal", date: "2026-08-25" },
+          { test: "WBC Count", value: "6.4", unit: "x10^3/uL", range: "4.5 - 11.0", status: "Normal", date: "2026-08-25" }
+        ],
+        notes: "Week 6 post-op. Active range of motion: 0 degrees extension, 115 degrees flexion. Transitioning to closed-chain strength training."
+      },
+      {
+        id: "PC-310",
+        name: "Amina Diallo",
+        age: 52,
+        gender: "Female",
+        dob: "1974-12-05",
+        bloodType: "A+",
+        department: "Nephrology",
+        photo: "AD",
+        avatarColor: "bg-violet-100 text-violet-800",
+        status: "Renal Function Monitoring",
+        riskLevel: "High",
+        condition: "Autosomal Dominant Polycystic Kidney Disease (ADPKD) & Resistant HTN",
+        attending: "Dr. Sarah Lin, MD",
+        contact: "+1 (555) 890-3321",
+        email: "amina.diallo@example.com",
+        allergies: ["Ceftriaxone (Hives)"],
+        medications: [
+          { name: "Tolvaptan (Jynarque)", dosage: "45mg/15mg", freq: "Split morning/afternoon regimen", category: "Vasopressin Antagonist" },
+          { name: "Losartan Potassium", dosage: "100mg", freq: "Once daily", category: "ARB" },
+          { name: "Chlorthalidone", dosage: "25mg", freq: "Every morning", category: "Thiazide Diuretic" }
+        ],
+        vitals: { hr: 74, bp: "138/88", spo2: 98, temp: "98.4", resp: 16 },
+        labs: [
+          { test: "Serum Creatinine", value: "1.74", unit: "mg/dL", range: "0.59 - 1.04 mg/dL", status: "High", date: "2026-08-19" },
+          { test: "eGFR", value: "36", unit: "mL/min", range: "> 60 mL/min", status: "Low", date: "2026-08-19" },
+          { test: "Serum Sodium", value: "140", unit: "mEq/L", range: "135 - 145 mEq/L", status: "Normal", date: "2026-08-19" }
+        ],
+        notes: "Serum sodium strictly monitored while on Tolvaptan. Daily fluid intake verified at 3.5 Liters."
+      },
+      {
+        id: "PC-311",
+        name: "Robert O'Connor",
+        age: 69,
+        gender: "Male",
+        dob: "1957-05-22",
+        bloodType: "O+",
+        department: "Neurology",
+        photo: "RO",
+        avatarColor: "bg-stone-100 text-stone-800",
+        status: "Outpatient Neuro Care",
+        riskLevel: "Moderate",
+        condition: "Idiopathic Parkinson's Disease (Hoehn & Yahr Stage 2)",
+        attending: "Dr. David Sterling, MD",
+        contact: "+1 (555) 641-7788",
+        email: "robert.oconnor@example.com",
+        allergies: ["Morphine (Severe Hallucinations)"],
+        medications: [
+          { name: "Carbidopa-Levodopa (Sinemet 25/100)", dosage: "1 tab", freq: "Three times daily (08:00, 13:00, 18:00)", category: "Dopamine Precursor" },
+          { name: "Rasagiline", dosage: "1mg", freq: "Once daily mornings", category: "MAO-B Inhibitor" }
+        ],
+        vitals: { hr: 70, bp: "124/80", spo2: 97, temp: "98.2", resp: 15 },
+        labs: [
+          { test: "Comprehensive Metabolic Panel", value: "Stable", unit: "Score", range: "Electrolytes Normal", status: "Normal", date: "2026-08-05" },
+          { test: "Thyroid Stimulating Hormone (TSH)", value: "1.92", unit: "uIU/mL", range: "0.4 - 4.0", status: "Normal", date: "2026-08-05" }
+        ],
+        notes: "Rest tremor well managed during 'on' periods. Handwriting micro-graphia improved since dosing schedule adjustment."
+      },
+      {
+        id: "PC-312",
+        name: "Fatima Zahra",
+        age: 31,
+        gender: "Female",
+        dob: "1995-10-08",
+        bloodType: "A-",
+        department: "Hematology",
+        photo: "FZ",
+        avatarColor: "bg-emerald-100 text-emerald-800",
+        status: "Specialty Clinic Follow-up",
+        riskLevel: "Low",
+        condition: "Beta-Thalassemia Minor & Hypochromic Microcytic Anemia",
+        attending: "Dr. Sarah Lin, MD",
+        contact: "+1 (555) 492-6612",
+        email: "fatima.zahra@example.com",
+        allergies: ["Aspirin (Gastric Irritation)"],
+        medications: [
+          { name: "Folic Acid", dosage: "5mg", freq: "Once daily with food", category: "B-Vitamin Supplement" }
+        ],
+        vitals: { hr: 75, bp: "110/70", spo2: 99, temp: "98.5", resp: 16 },
+        labs: [
+          { test: "Hemoglobin (Hgb)", value: "10.4", unit: "g/dL", range: "12.0 - 15.5 g/dL", status: "Low (Baseline)", date: "2026-08-11" },
+          { test: "Mean Corpuscular Volume (MCV)", value: "66", unit: "fL", range: "80 - 100 fL", status: "Low", date: "2026-08-11" },
+          { test: "Serum Ferritin", value: "85", unit: "ng/mL", range: "15 - 150 ng/mL", status: "Normal (Iron adequate)", date: "2026-08-11" }
+        ],
+        notes: "Mentzer Index is 10.2 (< 13), confirming Beta-Thalassemia trait rather than iron deficiency. Patient advised iron supplementation is contraindicated."
+      }
+    ];
+
+    // State Controller
+    class PulseCareApp {
+      constructor() {
+        this.patients = JSON.parse(localStorage.getItem('pulsecare_patients')) || INITIAL_PATIENTS;
+        this.activePatient = this.patients[0];
+        this.currentTab = 'dashboard';
+        this.filterDept = 'All';
+        this.searchQuery = '';
+        this.telehealthActive = false;
+        this.telehealthMuted = false;
+        this.telehealthVideoOn = true;
+        this.callSeconds = 0;
+        this.callTimerInterval = null;
+      }
+
+      init() {
+        this.render();
+      }
+
+      setTab(tab) {
+        this.currentTab = tab;
+        this.render();
+      }
+
+      selectPatient(patientId) {
+        const p = this.patients.find(item => item.id === patientId);
+        if (p) {
+          this.activePatient = p;
+          this.setTab('patients');
+        }
+      }
+
+      setFilterDept(dept) {
+        this.filterDept = dept;
+        this.render();
+      }
+
+      setSearch(query) {
+        this.searchQuery = query.toLowerCase();
+        this.render();
+      }
+
+      // Add New Patient Handler
+      openAddPatientModal() {
+        const modal = document.getElementById('modal-container');
+        if (!modal) return;
+        modal.innerHTML = `
+          <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+            <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-bold text-slate-900">Register New Clinical Patient</h3>
+                    <p class="text-xs text-slate-500">Adds profile to multi-patient electronic directory</p>
+                  </div>
+                </div>
+                <button onclick="app.closeModal()" class="text-slate-400 hover:text-slate-700 p-1">
+                  <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+              </div>
+
+              <form onsubmit="app.handleCreatePatient(event)" class="space-y-3.5 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Full Name *</label>
+                    <input required name="fullName" placeholder="e.g. David Miller" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20" />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Date of Birth *</label>
+                    <input required type="date" name="dob" value="1982-05-14" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Gender *</label>
+                    <select name="gender" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Blood Type</label>
+                    <select name="bloodType" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                      <option value="O+">O+</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option>
+                      <option value="O-">O-</option><option value="A-">A-</option><option value="B-">B-</option><option value="AB-">AB-</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Department *</label>
+                    <select name="department" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                      <option value="Cardiology">Cardiology</option>
+                      <option value="Endocrinology">Endocrinology</option>
+                      <option value="Pulmonology">Pulmonology</option>
+                      <option value="Pediatrics">Pediatrics</option>
+                      <option value="Geriatrics">Geriatrics</option>
+                      <option value="Oncology">Oncology</option>
+                      <option value="Rheumatology">Rheumatology</option>
+                      <option value="Nephrology">Nephrology</option>
+                      <option value="Neurology">Neurology</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Primary Clinical Diagnosis / Condition *</label>
+                  <input required name="condition" placeholder="e.g. Essential Hypertension & Hyperlipidemia" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Documented Allergies (comma separated)</label>
+                    <input name="allergies" placeholder="e.g. Penicillin, Latex" class="w-full px-3 py-2 border border-slate-200 rounded-xl" />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Clinical Risk Level</label>
+                    <select name="riskLevel" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                      <option value="Low">Low / Stable</option>
+                      <option value="Moderate">Moderate</option>
+                      <option value="High">High Risk</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Initial Clinical Notes</label>
+                  <textarea name="notes" rows="2" placeholder="Initial intake observations and treatment plan..." class="w-full px-3 py-2 border border-slate-200 rounded-xl"></textarea>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end gap-2">
+                  <button type="button" onclick="app.closeModal()" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-xl">Cancel</button>
+                  <button type="submit" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+                    <i data-lucide="check" class="w-4 h-4"></i> Save & Open Patient
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+
+      handleCreatePatient(e) {
+        e.preventDefault();
+        const form = e.target;
+        const name = form.fullName.value;
+        const dob = form.dob.value;
+        const age = new Date().getFullYear() - new Date(dob).getFullYear() || 35;
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+        const newP = {
+          id: "PC-" + Math.floor(320 + Math.random() * 80),
+          name: name,
+          age: age,
+          gender: form.gender.value,
+          dob: dob,
+          bloodType: form.bloodType.value,
+          department: form.department.value,
+          photo: initials,
+          avatarColor: "bg-teal-100 text-teal-800",
+          status: "Active In-Clinic",
+          riskLevel: form.riskLevel.value,
+          condition: form.condition.value,
+          attending: "Dr. Sarah Lin, MD",
+          contact: "+1 (555) 000-" + Math.floor(1000 + Math.random() * 9000),
+          email: name.toLowerCase().replace(/\s+/g, '.') + "@example.com",
+          allergies: form.allergies.value ? form.allergies.value.split(',').map(a => a.trim()).filter(Boolean) : ["No Known Allergies (NKDA)"],
+          medications: [
+            { name: "Therapeutic Regimen", dosage: "TBD", freq: "Per physician consultation", category: "Standard of Care" }
+          ],
+          vitals: { hr: 72, bp: "120/80", spo2: 98, temp: "98.6", resp: 16 },
+          labs: [
+            { test: "Initial Screening Panel", value: "Within Limits", unit: "Normal", range: "Standard Clinical Range", status: "Normal", date: new Date().toISOString().split('T')[0] }
+          ],
+          notes: form.notes.value || "Initial intake completed. Baseline lab work ordered."
+        };
+
+        this.patients.unshift(newP);
+        this.activePatient = newP;
+        localStorage.setItem('pulsecare_patients', JSON.stringify(this.patients));
+        
+        const countEl = document.getElementById('header-patient-count');
+        if (countEl) countEl.textContent = this.patients.length;
+
+        this.closeModal();
+        this.setTab('patients');
+      }
+
+      closeModal() {
+        const modal = document.getElementById('modal-container');
+        if (modal) modal.innerHTML = '';
+      }
+
+      // ECG Canvas
+      initECG() {
+        const canvas = document.getElementById('ecg-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let x = 0;
+        let lastY = canvas.height / 2;
+        const speed = 2.5;
+        const beatPattern = [0, 0, 2, 4, 2, 0, -4, 28, -8, 0, 0, 3, 6, 4, 1, 0];
+        let patternIdx = 0;
+        let inBeat = false;
+        let beatCounter = 0;
+
+        function draw() {
+          if (!canvas || !canvas.getContext) return;
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.08)';
+          ctx.fillRect(x, 0, speed * 2, canvas.height);
+
+          let targetOffset = 0;
+          beatCounter++;
+          if (beatCounter > 48) { inBeat = true; beatCounter = 0; patternIdx = 0; }
+          if (inBeat) {
+            if (patternIdx < beatPattern.length) { targetOffset = beatPattern[patternIdx]; patternIdx++; }
+            else { inBeat = false; }
+          }
+          const baseline = canvas.height / 2;
+          const currentY = baseline - targetOffset * 1.5 + (Math.random() * 1.2 - 0.6);
+
+          ctx.beginPath();
+          ctx.strokeStyle = '#10b981';
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.moveTo(x - speed, lastY);
+          ctx.lineTo(x, currentY);
+          ctx.stroke();
+
+          lastY = currentY;
+          x += speed;
+          if (x >= canvas.width) x = 0;
+          requestAnimationFrame(draw);
+        }
+        requestAnimationFrame(draw);
+      }
+
+      // Render
+      render() {
+        const countEl = document.getElementById('header-patient-count');
+        if (countEl) countEl.textContent = this.patients.length;
+
+        ['dashboard', 'patients', 'telehealth', 'ai-triage', 'appointments'].forEach(tab => {
+          const btn = document.getElementById('nav-' + tab);
+          if (btn) {
+            btn.className = this.currentTab === tab 
+              ? "px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-white text-slate-900 shadow-xs flex items-center gap-1.5"
+              : "px-3.5 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5";
+          }
+        });
+
+        const container = document.getElementById('view-container');
+        if (!container) return;
+
+        if (this.currentTab === 'dashboard') container.innerHTML = this.renderDashboard();
+        else if (this.currentTab === 'patients') container.innerHTML = this.renderPatientsView();
+        else if (this.currentTab === 'telehealth') container.innerHTML = this.renderTelehealthView();
+        else if (this.currentTab === 'ai-triage') container.innerHTML = this.renderAITriageView();
+        else if (this.currentTab === 'appointments') container.innerHTML = this.renderAppointmentsView();
+
+        lucide.createIcons();
+        if (this.currentTab === 'dashboard') this.initECG();
+      }
+
+      // 1. Dashboard View
+      renderDashboard() {
+        return `
+          <div class="space-y-6">
+            <!-- Banner -->
+            <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-brand-900 text-white rounded-3xl p-6 lg:p-8 shadow-xl flex flex-wrap items-center justify-between gap-6">
+              <div class="max-w-2xl space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-brand-300 text-xs font-bold">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> HIPAA Verified Clinical Shift
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Clinical Overview — Dr. Sarah Lin</h1>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                  Managing <strong>${this.patients.length} Active Clinical Profiles</strong> across Cardiology, Oncology, Nephrology, Pediatrics, and Geriatrics.
+                </p>
+                <div class="pt-2 flex flex-wrap gap-2.5">
+                  <button onclick="app.openAddPatientModal()" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-slate-900 font-bold rounded-xl shadow-lg transition flex items-center gap-2 text-xs">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> + Add New Patient Profile
+                  </button>
+                  <button onclick="app.setTab('patients')" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold rounded-xl transition flex items-center gap-2 text-xs">
+                    <i data-lucide="folder-open" class="w-4 h-4"></i> Explore All ${this.patients.length} Patient Charts
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Cohort Stats Badge -->
+              <div class="p-5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 text-center min-w-[180px]">
+                <div class="text-3xl font-black text-brand-400 font-mono">${this.patients.length}</div>
+                <div class="text-xs font-bold text-slate-200 mt-1 uppercase tracking-wider">Cohort Size</div>
+                <div class="text-[11px] text-emerald-300 mt-0.5">100% Data Verified</div>
+              </div>
+            </div>
+
+            <!-- ECG & Telemetry Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div class="lg:col-span-2 space-y-6">
+                <!-- ECG Strip -->
+                <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800 shadow-xl text-white space-y-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <h3 class="text-xs font-bold tracking-wider uppercase text-slate-300">Continuous Lead II Rhythm • ${this.activePatient.name} (${this.activePatient.id})</h3>
+                    </div>
+                    <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-800">
+                      ${this.activePatient.department}
+                    </span>
+                  </div>
+                  <div class="relative w-full h-28 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
+                    <canvas id="ecg-canvas" width="600" height="112" class="w-full h-full block"></canvas>
+                  </div>
+                  <div class="grid grid-cols-4 gap-3 text-center">
+                    <div class="p-2.5 bg-slate-800 rounded-xl">
+                      <div class="text-[10px] text-slate-400 font-bold uppercase">Heart Rate</div>
+                      <div class="text-lg font-black text-emerald-400 font-mono">${this.activePatient.vitals.hr} <span class="text-xs font-normal">bpm</span></div>
+                    </div>
+                    <div class="p-2.5 bg-slate-800 rounded-xl">
+                      <div class="text-[10px] text-slate-400 font-bold uppercase">Blood Pressure</div>
+                      <div class="text-lg font-black text-white font-mono">${this.activePatient.vitals.bp}</div>
+                    </div>
+                    <div class="p-2.5 bg-slate-800 rounded-xl">
+                      <div class="text-[10px] text-slate-400 font-bold uppercase">SpO2</div>
+                      <div class="text-lg font-black text-blue-400 font-mono">${this.activePatient.vitals.spo2}%</div>
+                    </div>
+                    <div class="p-2.5 bg-slate-800 rounded-xl">
+                      <div class="text-[10px] text-slate-400 font-bold uppercase">Respiration</div>
+                      <div class="text-lg font-black text-purple-400 font-mono">${this.activePatient.vitals.resp}/m</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Labs Card -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Latest Verified Lab Panels (${this.activePatient.name})</h3>
+                    <button onclick="app.setTab('patients')" class="text-xs text-brand-600 font-bold hover:underline">View Chart</button>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                      <thead>
+                        <tr class="border-b border-slate-100 text-slate-400 uppercase font-bold">
+                          <th class="pb-2">Test Name</th>
+                          <th class="pb-2">Result</th>
+                          <th class="pb-2">Reference Range</th>
+                          <th class="pb-2">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        ${this.activePatient.labs.map(l => `
+                          <tr>
+                            <td class="py-2.5 font-semibold text-slate-800">${l.test}</td>
+                            <td class="py-2.5 font-mono font-bold text-slate-900">${l.value} ${l.unit}</td>
+                            <td class="py-2.5 font-mono text-slate-500">${l.range}</td>
+                            <td class="py-2.5"><span class="px-2 py-0.5 rounded font-bold text-[10px] ${l.status.includes('High') ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${l.status}</span></td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Patient Switcher (12 Patients) -->
+              <div class="space-y-4">
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Active Cohort (${this.patients.length})</h3>
+                    <button onclick="app.openAddPatientModal()" class="text-xs font-bold text-brand-600 hover:underline">+ Add</button>
+                  </div>
+                  <div class="space-y-2 max-h-96 overflow-y-auto pr-1">
+                    ${this.patients.map(p => `
+                      <div 
+                        onclick="app.selectPatient('${p.id}')"
+                        class="p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-between text-xs ${
+                          this.activePatient.id === p.id ? 'border-brand-500 bg-brand-50/60 ring-2 ring-brand-500/20' : 'border-slate-100 hover:border-slate-300 bg-white'
+                        }"
+                      >
+                        <div class="flex items-center gap-2.5">
+                          <div class="w-8 h-8 rounded-lg ${p.avatarColor} font-black flex items-center justify-center text-[11px]">
+                            ${p.photo}
+                          </div>
+                          <div>
+                            <div class="font-bold text-slate-900">${p.name}</div>
+                            <div class="text-[10px] text-slate-500">${p.age}y • ${p.department}</div>
+                          </div>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          p.riskLevel === 'High' ? 'bg-rose-100 text-rose-800' : p.riskLevel === 'Moderate' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                        }">${p.riskLevel}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 2. Patient Directory View (Filterable 12+ Patients)
+      renderPatientsView() {
+        const p = this.activePatient;
+        const departments = ['All', 'Cardiology', 'Endocrinology', 'Pediatrics', 'Geriatrics', 'Pulmonology', 'Obstetrics', 'Oncology', 'Rheumatology', 'Orthopedics', 'Nephrology', 'Neurology', 'Hematology'];
+        
+        let filtered = this.patients.filter(item => {
+          const matchDept = this.filterDept === 'All' || item.department === this.filterDept;
+          const matchQuery = !this.searchQuery || 
+            item.name.toLowerCase().includes(this.searchQuery) ||
+            item.id.toLowerCase().includes(this.searchQuery) ||
+            item.condition.toLowerCase().includes(this.searchQuery) ||
+            item.department.toLowerCase().includes(this.searchQuery);
+          return matchDept && matchQuery;
+        });
+
+        return `
+          <div class="space-y-6">
+            <!-- Top Controls: Search Bar + Add Patient Button + Specialty Filters -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h2 class="text-xl font-extrabold text-slate-900">Patient Directory & Clinical Charts</h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Showing <strong>${filtered.length} of ${this.patients.length}</strong> patient records</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="relative w-64">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                    <input 
+                      type="text" 
+                      placeholder="Search name, condition, ID..." 
+                      value="${this.searchQuery}"
+                      oninput="app.setSearch(this.value)"
+                      class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    />
+                  </div>
+                  <button onclick="app.openAddPatientModal()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Add Patient
+                  </button>
+                </div>
+              </div>
+
+              <!-- Department Filter Chips -->
+              <div class="flex flex-wrap gap-1.5 pt-1 border-t border-slate-100">
+                ${departments.map(d => `
+                  <button 
+                    onclick="app.setFilterDept('${d}')"
+                    class="px-3 py-1 rounded-xl text-xs font-bold transition ${
+                      this.filterDept === d 
+                        ? 'bg-slate-900 text-white shadow-xs' 
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }"
+                  >
+                    ${d}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Patient Grid Cards (Quick Switcher) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              ${filtered.map(item => `
+                <div 
+                  onclick="app.selectPatient('${item.id}')"
+                  class="p-4 rounded-3xl border bg-white shadow-xs transition hover:shadow-md cursor-pointer flex flex-col justify-between space-y-3 ${
+                    this.activePatient.id === item.id ? 'border-brand-500 ring-2 ring-brand-500/20' : 'border-slate-200 hover:border-slate-300'
+                  }"
+                >
+                  <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-2xl ${item.avatarColor} font-black flex items-center justify-center text-sm">
+                        ${item.photo}
+                      </div>
+                      <div>
+                        <div class="font-bold text-xs text-slate-900">${item.name}</div>
+                        <div class="text-[11px] text-slate-500 font-mono">${item.id} • ${item.age}y</div>
+                      </div>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      item.riskLevel === 'High' ? 'bg-rose-100 text-rose-800' : item.riskLevel === 'Moderate' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                    }">${item.riskLevel}</span>
+                  </div>
+
+                  <div class="text-[11px] text-slate-600 line-clamp-2 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    ${item.condition}
+                  </div>
+
+                  <div class="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100">
+                    <span class="font-bold text-brand-700">${item.department}</span>
+                    <span class="text-slate-400 font-mono">${item.vitals.bp}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Active Selected Patient Complete Clinical EHR Chart -->
+            <div class="bg-white rounded-3xl p-6 lg:p-8 border border-slate-200 shadow-sm space-y-6">
+              <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                <div class="flex items-center gap-4">
+                  <div class="w-16 h-16 rounded-3xl ${p.avatarColor} font-black text-2xl flex items-center justify-center shadow-inner">
+                    ${p.photo}
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h2 class="text-2xl font-black text-slate-900">${p.name}</h2>
+                      <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">${p.id}</span>
+                      <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${p.riskLevel === 'High' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${p.riskLevel} Risk</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">
+                      ${p.gender}, ${p.age} years old (DOB: ${p.dob}) • Blood Group: <strong>${p.bloodType}</strong> • Specialty: <strong>${p.department}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                  <button onclick="app.setTab('telehealth')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-sm transition flex items-center gap-1.5">
+                    <i data-lucide="video" class="w-4 h-4"></i> Start Telehealth Call
+                  </button>
+                  <button onclick="alert('Printing verified patient record for ' + app.activePatient.name)" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs shadow-sm transition flex items-center gap-1.5">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Print Summary
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3-Column Patient Details -->
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 text-xs">
+                <!-- Allergies & Meds -->
+                <div class="space-y-4">
+                  <div class="p-4 bg-rose-50/70 rounded-2xl border border-rose-200 space-y-2">
+                    <div class="font-bold text-rose-900 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                      <i data-lucide="shield-alert" class="w-4 h-4 text-rose-600"></i> Documented Allergies
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                      ${p.allergies.map(a => `<span class="px-2.5 py-1 rounded-lg bg-white border border-rose-200 font-bold text-rose-800 text-[11px]">${a}</span>`).join('')}
+                    </div>
+                  </div>
+
+                  <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+                    <div class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Active Prescriptions (${p.medications.length})</div>
+                    <div class="space-y-2">
+                      ${p.medications.map(m => `
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200">
+                          <div class="font-bold text-slate-900">${m.name} ${m.dosage}</div>
+                          <div class="text-[11px] text-slate-500 mt-0.5">${m.freq}</div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Clinical Notes & Vitals -->
+                <div class="lg:col-span-2 space-y-4">
+                  <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                    <div class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Attending Physician Clinical Notes</div>
+                    <p class="text-slate-700 leading-relaxed text-xs">${p.notes}</p>
+                  </div>
+
+                  <div class="p-4 bg-white rounded-2xl border border-slate-200 space-y-3">
+                    <div class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Diagnostic Lab Interval Results</div>
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-left text-xs">
+                        <thead>
+                          <tr class="border-b border-slate-100 text-slate-400 font-bold">
+                            <th class="pb-2">Test</th>
+                            <th class="pb-2">Result</th>
+                            <th class="pb-2">Reference</th>
+                            <th class="pb-2">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                          ${p.labs.map(l => `
+                            <tr>
+                              <td class="py-2.5 font-semibold text-slate-800">${l.test}</td>
+                              <td class="py-2.5 font-mono font-bold text-slate-900">${l.value} ${l.unit}</td>
+                              <td class="py-2.5 font-mono text-slate-500">${l.range}</td>
+                              <td class="py-2.5"><span class="px-2 py-0.5 rounded font-bold text-[10px] ${l.status.includes('High') ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${l.status}</span></td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 3. Virtual Telehealth View
+      renderTelehealthView() {
+        const p = this.activePatient;
+        return `
+          <div class="space-y-6">
+            <div class="bg-slate-900 text-white rounded-3xl p-6 shadow-xl flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 class="text-xl font-bold">Telehealth Video Encounter: ${p.name}</h2>
+                <p class="text-xs text-slate-400">Department: ${p.department} • Active Patient ID: ${p.id}</p>
+              </div>
+              <button onclick="alert('Session connected successfully.')" class="px-4 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs">
+                Live Video Online
+              </button>
+            </div>
+
+            <div class="aspect-video bg-slate-950 rounded-3xl border border-slate-800 shadow-2xl flex flex-col items-center justify-center text-center p-8 text-white relative">
+              <div class="w-24 h-24 rounded-full ${p.avatarColor} font-black text-3xl flex items-center justify-center shadow-xl mb-4 ring-4 ring-slate-800">
+                ${p.photo}
+              </div>
+              <h3 class="text-lg font-bold">${p.name}</h3>
+              <p class="text-xs text-slate-400 mt-1">Encrypted High-Definition Telehealth Stream (1080p WebRTC)</p>
+              
+              <div class="mt-6 flex items-center gap-3">
+                <button onclick="alert('Microphone toggled')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center">
+                  <i data-lucide="mic" class="w-4 h-4"></i>
+                </button>
+                <button onclick="alert('Camera toggled')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center">
+                  <i data-lucide="video" class="w-4 h-4"></i>
+                </button>
+                <button onclick="app.setTab('patients')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl">
+                  Back to Chart
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 4. AI Sentinel View
+      renderAITriageView() {
+        return `
+          <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xs space-y-6">
+            <h2 class="text-xl font-extrabold text-slate-900">AI Clinical Sentinel & Safety Engine</h2>
+            <p class="text-xs text-slate-500">Screen drug interactions and analyze symptom severity triage.</p>
+            <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900">
+              <strong>All ${this.patients.length} Patient Profiles Active:</strong> Ready for real-time drug contraindication screening and automated triage protocols.
+            </div>
+          </div>
+        `;
+      }
+
+      // 5. Appointments View
+      renderAppointmentsView() {
+        return `
+          <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xs space-y-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-xl font-extrabold text-slate-900">Outpatient & Telehealth Schedule</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Manage appointment bookings across all ${this.patients.length} patients</p>
+              </div>
+              <button onclick="app.openAddPatientModal()" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold">
+                + Register New Patient
+              </button>
+            </div>
+            
+            <div class="divide-y divide-slate-100 text-xs">
+              ${this.patients.slice(0, 6).map(item => `
+                <div class="py-3 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg ${item.avatarColor} font-black flex items-center justify-center text-xs">${item.photo}</div>
+                    <div>
+                      <div class="font-bold text-slate-900">${item.name}</div>
+                      <div class="text-slate-500 text-[11px]">${item.department} • ${item.condition}</div>
+                    </div>
+                  </div>
+                  <button onclick="app.selectPatient('${item.id}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-slate-800">
+                    Open Record
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    const app = new PulseCareApp();
+    window.app = app;
+    document.addEventListener('DOMContentLoaded', () => app.init());
+  </script>
+</body>
+</html>
